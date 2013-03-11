@@ -10,7 +10,7 @@ sudo modprobe -r rtl8187
 echo "----------------------------" && 
 echo "cd driver directory" && 
 echo "----------------------------" && 
-cd /home/agostino/Scrivania/Dropbox/TESI/LinuxWireless/project_git/compat-wireless-3.5.4-1-s/ && 
+cd /home/agostino/Scrivania/Dropbox/TESI/wireless/compat-wireless-3.5.4-1-s/ && 
 
 #install
 echo "----------------------------" && 
