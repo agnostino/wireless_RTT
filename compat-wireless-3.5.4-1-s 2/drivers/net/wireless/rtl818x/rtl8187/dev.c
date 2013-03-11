@@ -28,6 +28,10 @@
 #include <linux/eeprom_93cx6.h>
 #include <linux/module.h>
 #include <net/mac80211.h>
+#include <linux/kernel.h> 	//Agostino Polizzano
+#include <linux/skbuff.h> 	//Agostino Polizzano
+#include <net/sock.h>	  	//Agostino Polizzano
+#include <linux/ip.h>	  	//Agostino Polizzano
 
 #include "rtl8187.h"
 #include "rtl8225.h"
@@ -180,7 +184,7 @@ void rtl8187_write_phy(struct ieee80211_hw *dev, u8 addr, u32 data)
 
 	data <<= 8;
 	data |= addr | 0x80;
-
+	
 	rtl818x_iowrite8(priv, &priv->map->PHY[3], (data >> 24) & 0xFF);
 	rtl818x_iowrite8(priv, &priv->map->PHY[2], (data >> 16) & 0xFF);
 	rtl818x_iowrite8(priv, &priv->map->PHY[1], (data >> 8) & 0xFF);
@@ -193,6 +197,14 @@ static void rtl8187_tx_cb(struct urb *urb)
 	struct ieee80211_tx_info *info = IEEE80211_SKB_CB(skb);
 	struct ieee80211_hw *hw = info->rate_driver_data[0];
 	struct rtl8187_priv *priv = hw->priv;
+	
+	struct iphdr *network_header;   												//Agostino Polizzano
+	__be32 ap_address = 0x0101A8C0; //192.168.1.1									//Agostino Polizzano
+	
+	network_header = (struct iphdr *)skb_network_header(skb);						//Agostino Polizzano
+	if (network_header->daddr == ap_address) {										//Agostino Polizzano
+		printk(KERN_EMERG "rtl8187_tx_cb: @_dst: %pI4\n", &network_header->daddr);	//Agostino Polizzano
+	}																				//Agostino Polizzano
 
 	skb_pull(skb, priv->is_rtl8187b ? sizeof(struct rtl8187b_tx_hdr) :
 					  sizeof(struct rtl8187_tx_hdr));
@@ -240,9 +252,9 @@ static void rtl8187_tx(struct ieee80211_hw *dev, struct sk_buff *skb)
 	u32 flags;
 	int rc;
 
-	urb = usb_alloc_urb(0, GFP_ATOMIC);
+	urb = usb_alloc_urb(0, GFP_ATOMIC);	//creates a new urb for a USB driver
 	if (!urb) {
-		kfree_skb(skb);
+		kfree_skb(skb);					//free an sk_buff
 		return;
 	}
 
@@ -271,11 +283,11 @@ static void rtl8187_tx(struct ieee80211_hw *dev, struct sk_buff *skb)
 
 	if (!priv->is_rtl8187b) {
 		struct rtl8187_tx_hdr *hdr =
-			(struct rtl8187_tx_hdr *)skb_push(skb, sizeof(*hdr));
-		hdr->flags = cpu_to_le32(flags);
+			(struct rtl8187_tx_hdr *)skb_push(skb, sizeof(*hdr));		//add data to the start of a buffer (skb)
+		hdr->flags = cpu_to_le32(flags);								//little endian handling
 		hdr->len = 0;
 		hdr->rts_duration = rts_dur;
-		hdr->retry = cpu_to_le32((info->control.rates[0].count - 1) << 8);
+		hdr->retry = cpu_to_le32((info->control.rates[0].count - 1) << 8);	//little endian handling
 		buf = hdr;
 
 		ep = 2;
@@ -308,17 +320,26 @@ static void rtl8187_tx(struct ieee80211_hw *dev, struct sk_buff *skb)
 	info->rate_driver_data[1] = urb;
 
 	usb_fill_bulk_urb(urb, priv->udev, usb_sndbulkpipe(priv->udev, ep),
-			  buf, skb->len, rtl8187_tx_cb, skb);
+			  buf, skb->len, rtl8187_tx_cb, skb);					//macro to help initialize a bulk urb
+			  														//rtl8187_tx_cb: pointer to the usb_complete_t function
+			  														//skb: context for usb_complete_t function
 	urb->transfer_flags |= URB_ZERO_PACKET;
-	usb_anchor_urb(urb, &priv->anchored);
-	rc = usb_submit_urb(urb, GFP_ATOMIC);
+	usb_anchor_urb(urb, &priv->anchored);							//anchors an URB while it is processed
+	
+	rc = usb_submit_urb(urb, GFP_ATOMIC);							//issue an asynchronous transfer request for an endpoint
 	if (rc < 0) {
-		usb_unanchor_urb(urb);
+		usb_unanchor_urb(urb);										//unanchors an URB
 		kfree_skb(skb);
 	}
 	usb_free_urb(urb);
 }
 
+/* by Agostino Polizzano (this comment)
+Each URB has a completion handler, which is called after the action
+has been successfully completed or canceled (INT transfers behave a bit
+different, see below). The URB also contains a context-pointer for free 
+usage and information passing to the completion handler.
+*/
 static void rtl8187_rx_cb(struct urb *urb)
 {
 	struct sk_buff *skb = (struct sk_buff *)urb->context;
@@ -383,7 +404,20 @@ static void rtl8187_rx_cb(struct urb *urb)
 	if (flags & RTL818X_RX_DESC_FLAG_CRC32_ERR)
 		rx_status.flag |= RX_FLAG_FAILED_FCS_CRC;
 	memcpy(IEEE80211_SKB_RXCB(skb), &rx_status, sizeof(rx_status));
-	ieee80211_rx_irqsafe(dev, skb);
+							// Agostino Polizzano (comment)
+							/*  struct ieee80211_rx_status {
+									u64 mactime;
+									enum ieee80211_band band;
+									int freq;
+									int signal;
+									int antenna;
+									int rate_idx;
+									int flag;
+									unsigned int rx_flags;
+									};
+							*/
+
+	ieee80211_rx_irqsafe(dev, skb); 
 
 	skb = dev_alloc_skb(RTL8187_MAX_RX);
 	if (unlikely(!skb)) {
@@ -413,6 +447,8 @@ static int rtl8187_init_urbs(struct ieee80211_hw *dev)
 	struct sk_buff *skb;
 	struct rtl8187_rx_info *info;
 	int ret = 0;
+	
+	printk(KERN_EMERG "rtl8187_init_urbs\n");	//Agostino Polizzano
 
 	while (skb_queue_len(&priv->rx_queue) < 16) {
 		skb = __dev_alloc_skb(RTL8187_MAX_RX, GFP_KERNEL);
@@ -420,28 +456,30 @@ static int rtl8187_init_urbs(struct ieee80211_hw *dev)
 			ret = -ENOMEM;
 			goto err;
 		}
-		entry = usb_alloc_urb(0, GFP_KERNEL);
+		entry = usb_alloc_urb(0, GFP_KERNEL);    //creates a new urb for a USB driver to use
 		if (!entry) {
 			ret = -ENOMEM;
 			goto err;
 		}
+		//macro to help initialize a bulk urb
 		usb_fill_bulk_urb(entry, priv->udev,
 				  usb_rcvbulkpipe(priv->udev,
 				  priv->is_rtl8187b ? 3 : 1),
 				  skb_tail_pointer(skb),
-				  RTL8187_MAX_RX, rtl8187_rx_cb, skb);
+				  RTL8187_MAX_RX, rtl8187_rx_cb, skb);	//rtl8187_rx_cb: pointer to the usb_complete_t function
+				  										//skb: context for usb_complete_t function
 		info = (struct rtl8187_rx_info *)skb->cb;
 		info->urb = entry;
 		info->dev = dev;
 		skb_queue_tail(&priv->rx_queue, skb);
-		usb_anchor_urb(entry, &priv->anchored);
-		ret = usb_submit_urb(entry, GFP_KERNEL);
+		usb_anchor_urb(entry, &priv->anchored);		//anchors an URB while it is processed
+		ret = usb_submit_urb(entry, GFP_KERNEL);	//issue an asynchronous transfer request for an endpoint
 		if (ret) {
 			skb_unlink(skb, &priv->rx_queue);
 			usb_unanchor_urb(entry);
 			goto err;
 		}
-		usb_free_urb(entry);
+		usb_free_urb(entry);		//frees the memory used by a urb when all users of it are finished
 	}
 	return ret;
 
