@@ -3018,13 +3018,6 @@ void ieee80211_rx(struct ieee80211_hw *hw, struct sk_buff *skb)
 	
 	struct iphdr *network_header;    								//Agostino Polizzano
 	
- 	network_header = (struct iphdr *)skb_network_header(skb);		//Agostino Polizzano
- 	if(network_header != NULL) {									//Agostino Polizzano
- 		if(network_header->protocol == 1) {	//ICMP 					//Agostino Polizzano
- 			printk(KERN_EMERG "ieee80211_rx: @_src: %pI4 @_dst: %pI4\n", &network_header->saddr, &network_header->daddr);	//Agostino Polizzano
- 		}															//Agostino Polizzano
- 	}																//Agostino Polizzano
-
 	WARN_ON_ONCE(softirq_count() == 0);
 
 	if (WARN_ON(status->band < 0 ||
@@ -3110,6 +3103,16 @@ void ieee80211_rx(struct ieee80211_hw *hw, struct sk_buff *skb)
 			((struct ieee80211_hdr *)skb->data)->frame_control,
 			skb->len);
 	__ieee80211_rx_handle_packet(hw, skb);
+	
+	/* esattamente in questa posizione */ 
+		/* sarà la funzione __ieee80211_rx_handle_packet(hw, skb) a costruire l'skb*/
+			/* da approfondire */
+ 	network_header = (struct iphdr *)skb_network_header(skb);		//Agostino Polizzano
+ 	if(network_header != NULL) {									//Agostino Polizzano
+ 		if(network_header->protocol == 1) {	//ICMP 					//Agostino Polizzano
+ 			printk(KERN_EMERG "ieee80211_rx: @_src: %pI4 @_dst: %pI4\n", &network_header->saddr, &network_header->daddr);	//Agostino Polizzano
+ 		}															//Agostino Polizzano
+ 	}																//Agostino Polizzano
 
 	rcu_read_unlock();
 
