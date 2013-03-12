@@ -30,10 +30,7 @@
 #include "tkip.h"
 #include "wme.h"
 #include "rate.h"
-
-#include <linux/kernel.h> 	//Agostino Polizzano
-#include <net/sock.h>	  	//Agostino Polizzano
-#include <linux/ip.h>	  	//Agostino Polizzano
+#include "../../../my_func/my_func.h"				//Agostino Polizzano
 
 /*
  * monitor mode reception
@@ -3016,8 +3013,6 @@ void ieee80211_rx(struct ieee80211_hw *hw, struct sk_buff *skb)
 	struct ieee80211_supported_band *sband;
 	struct ieee80211_rx_status *status = IEEE80211_SKB_RXCB(skb);
 	
-	struct iphdr *network_header;    								//Agostino Polizzano
-	
 	WARN_ON_ONCE(softirq_count() == 0);
 
 	if (WARN_ON(status->band < 0 ||
@@ -3104,15 +3099,7 @@ void ieee80211_rx(struct ieee80211_hw *hw, struct sk_buff *skb)
 			skb->len);
 	__ieee80211_rx_handle_packet(hw, skb);
 	
-	/* esattamente in questa posizione */ 
-		/* sarà la funzione __ieee80211_rx_handle_packet(hw, skb) a costruire l'skb*/
-			/* da approfondire */
- 	network_header = (struct iphdr *)skb_network_header(skb);		//Agostino Polizzano
- 	if(network_header != NULL) {									//Agostino Polizzano
- 		if(network_header->protocol == 1) {	//ICMP 					//Agostino Polizzano
- 			printk(KERN_EMERG "ieee80211_rx: @_src: %pI4 @_dst: %pI4\n", &network_header->saddr, &network_header->daddr);	//Agostino Polizzano
- 		}															//Agostino Polizzano
- 	}																//Agostino Polizzano
+	rtt_stop (skb, 0x0101A8C0); //192.168.1.1							//Agostino Polizzano
 
 	rcu_read_unlock();
 

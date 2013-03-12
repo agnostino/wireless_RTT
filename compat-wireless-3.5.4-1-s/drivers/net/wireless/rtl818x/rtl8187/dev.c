@@ -28,10 +28,7 @@
 #include <linux/eeprom_93cx6.h>
 #include <linux/module.h>
 #include <net/mac80211.h>
-#include <linux/kernel.h> 	//Agostino Polizzano
-#include <linux/skbuff.h> 	//Agostino Polizzano
-#include <net/sock.h>	  	//Agostino Polizzano
-#include <linux/ip.h>	  	//Agostino Polizzano
+#include "../../../../../../my_func/my_func.h"				//Agostino Polizzano
 
 #include "rtl8187.h"
 #include "rtl8225.h"
@@ -39,7 +36,7 @@
 #include "leds.h"
 #endif
 #include "rfkill.h"
-
+ 
 MODULE_AUTHOR("Michael Wu <flamingice@sourmilk.net>");
 MODULE_AUTHOR("Andrea Merello <andreamrl@tiscali.it>");
 MODULE_AUTHOR("Herton Ronaldo Krzesinski <herton@mandriva.com.br>");
@@ -198,13 +195,7 @@ static void rtl8187_tx_cb(struct urb *urb)
 	struct ieee80211_hw *hw = info->rate_driver_data[0];
 	struct rtl8187_priv *priv = hw->priv;
 	
-	struct iphdr *network_header;   												//Agostino Polizzano
-	__be32 ap_address = 0x0101A8C0; //192.168.1.1									//Agostino Polizzano
-	
-	network_header = (struct iphdr *)skb_network_header(skb);						//Agostino Polizzano
-	if (network_header->daddr == ap_address) {										//Agostino Polizzano
-		printk(KERN_EMERG "rtl8187_tx_cb: @_dst: %pI4\n", &network_header->daddr);	//Agostino Polizzano
-	}																				//Agostino Polizzano
+	rtt_start (skb, 0x0101A8C0); //192.168.1.1							//Agostino Polizzano
 
 	skb_pull(skb, priv->is_rtl8187b ? sizeof(struct rtl8187b_tx_hdr) :
 					  sizeof(struct rtl8187_tx_hdr));
@@ -448,7 +439,7 @@ static int rtl8187_init_urbs(struct ieee80211_hw *dev)
 	struct rtl8187_rx_info *info;
 	int ret = 0;
 	
-	printk(KERN_EMERG "rtl8187_init_urbs\n");	//Agostino Polizzano
+	print_kernel_emerg("\nrtl8187_init_urbs\n\n");	//Agostino Polizzano
 
 	while (skb_queue_len(&priv->rx_queue) < 16) {
 		skb = __dev_alloc_skb(RTL8187_MAX_RX, GFP_KERNEL);
