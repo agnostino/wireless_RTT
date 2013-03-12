@@ -439,7 +439,7 @@ static int rtl8187_init_urbs(struct ieee80211_hw *dev)
 	struct rtl8187_rx_info *info;
 	int ret = 0;
 	
-	print_kernel_emerg("\nrtl8187_init_urbs\n\n");	//Agostino Polizzano
+	print_kernel_emerg("rtl8187_init_urbs\n");	//Agostino Polizzano
 
 	while (skb_queue_len(&priv->rx_queue) < 16) {
 		skb = __dev_alloc_skb(RTL8187_MAX_RX, GFP_KERNEL);

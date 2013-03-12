@@ -73,7 +73,7 @@ static inline void rtt_start (struct sk_buff *skb, __be32 _ip_address) {
 	if (network_header != NULL)
 		if (network_header->protocol == 1)	//ICMP
 			if (network_header->daddr == _ip_address)
-				printk(KERN_EMERG "RTT START: sent to %pI4 (packet type: ICMP)\n", &network_header->daddr);
+				printk(KERN_EMERG "\nRTT START: sent to %pI4 (packet type: ICMP)\n", &network_header->daddr);
 }
 
 														//0x0101A8C0; //192.168.1.1
