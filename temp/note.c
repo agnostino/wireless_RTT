@@ -70,3 +70,52 @@
 00047   IPPROTO_RAW    = 255,         /* Raw IP packets                       */
 00048   IPPROTO_MAX
 00049 };
+
+
+
+
+ 50 /* TSC based delay: */
+ 51 static void delay_tsc(unsigned long __loops)
+ 52 {
+ 53         u32 bclock, now, loops = __loops;
+ 54         int cpu;
+ 55 
+ 56         preempt_disable();
+ 57         cpu = smp_processor_id();
+ 58         rdtsc_barrier();
+ 59         rdtscl(bclock);
+ 60         for (;;) {
+ 61                 rdtsc_barrier();
+ 62                 rdtscl(now);
+ 63                 if ((now - bclock) >= loops)
+ 64                         break;
+ 65 
+ 66                 /* Allow RT tasks to run */
+ 67                 preempt_enable();
+ 68                 rep_nop();
+ 69                 preempt_disable();
+ 70 
+ 71                 /*
+ 72                  * It is possible that we moved to another CPU, and
+ 73                  * since TSC's are per-cpu we need to calculate
+ 74                  * that. The delay must guarantee that we wait "at
+ 75                  * least" the amount of time. Being moved to another
+ 76                  * CPU could make the wait longer but we just need to
+ 77                  * make sure we waited long enough. Rebalance the
+ 78                  * counter for this CPU.
+ 79                  */
+ 80                 if (unlikely(cpu != smp_processor_id())) {
+ 81                         loops -= (now - bclock);
+ 82                         cpu = smp_processor_id();
+ 83                         rdtsc_barrier();
+ 84                         rdtscl(bclock);
+ 85                 }
+ 86         }
+ 87         preempt_enable();
+ 88 }
+ 
+ 
+ 
+unsigned long ini, end;
+rdtscl(ini); rdtscl(end);
+printk("time lapse: %li\n", end - ini);
