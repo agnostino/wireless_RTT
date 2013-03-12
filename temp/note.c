@@ -119,3 +119,10 @@
 unsigned long ini, end;
 rdtscl(ini); rdtscl(end);
 printk("time lapse: %li\n", end - ini);
+
+
+typedef unsigned long long cycles_t;
+ #include <linux/timex.h>
+ cycles_t get_cycles(void);
+ 
+ get_cycles— The resolution of get_cycles is various. The get_cycles function, which is defined all on platforms, returns a count of system clock cycles that fit into a single CPU register. Typically this is the lower half of the two 32-bit counters mentioned previously. If the processor doesn't contain a clock counter, get_cycles returns 0. get_cycles returns 0 on 486 and ARM processors.
