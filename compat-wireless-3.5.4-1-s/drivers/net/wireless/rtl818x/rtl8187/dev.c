@@ -28,7 +28,7 @@
 #include <linux/eeprom_93cx6.h>
 #include <linux/module.h>
 #include <net/mac80211.h>
-#include "../../../../../../my_func/my_func.h"				//Agostino Polizzano
+#include "../../../../../../my_func/my_func_tx.h"				//Agostino Polizzano
 
 #include "rtl8187.h"
 #include "rtl8225.h"
@@ -36,6 +36,8 @@
 #include "leds.h"
 #endif
 #include "rfkill.h"
+
+unsigned long long before;										//Agostino Polizzano
  
 MODULE_AUTHOR("Michael Wu <flamingice@sourmilk.net>");
 MODULE_AUTHOR("Andrea Merello <andreamrl@tiscali.it>");
@@ -230,6 +232,7 @@ static void rtl8187_tx_cb(struct urb *urb)
 		ieee80211_queue_delayed_work(hw, &priv->work, 0);
 	}
 }
+EXPORT_SYMBOL(before);												//Agostino Polizzano
 
 static void rtl8187_tx(struct ieee80211_hw *dev, struct sk_buff *skb)
 {
@@ -439,7 +442,7 @@ static int rtl8187_init_urbs(struct ieee80211_hw *dev)
 	struct rtl8187_rx_info *info;
 	int ret = 0;
 	
-	print_kernel_emerg("rtl8187_init_urbs\n");	//Agostino Polizzano
+	printk(KERN_EMERG "rtl8187_init_urbs\n");	//Agostino Polizzano
 
 	while (skb_queue_len(&priv->rx_queue) < 16) {
 		skb = __dev_alloc_skb(RTL8187_MAX_RX, GFP_KERNEL);

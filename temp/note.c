@@ -126,3 +126,20 @@ typedef unsigned long long cycles_t;
  cycles_t get_cycles(void);
  
  get_cycles— The resolution of get_cycles is various. The get_cycles function, which is defined all on platforms, returns a count of system clock cycles that fit into a single CPU register. Typically this is the lower half of the two 32-bit counters mentioned previously. If the processor doesn't contain a clock counter, get_cycles returns 0. get_cycles returns 0 on 486 and ARM processors.
+ 
+ 
+ 
+ 
+ All the symbols that the kernel is aware of is listed in /proc/kallsyms. Let us search for our symbol in this file. 
+
+$ cat /proc/kallsyms | grep module_export 
+
+
+List Available Kernel Modules:
+modprobe -l | less
+
+List Currently Loaded Modules:
+lsmod | less
+
+
+

@@ -30,7 +30,7 @@
 #include "tkip.h"
 #include "wme.h"
 #include "rate.h"
-#include "../../../my_func/my_func.h"				//Agostino Polizzano
+#include "../../../my_func/my_func_rx.h"				//Agostino Polizzano
 
 /*
  * monitor mode reception
