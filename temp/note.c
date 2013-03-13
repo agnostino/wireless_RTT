@@ -132,7 +132,7 @@ typedef unsigned long long cycles_t;
  
  All the symbols that the kernel is aware of is listed in /proc/kallsyms. Let us search for our symbol in this file. 
 
-$ cat /proc/kallsyms | grep module_export 
+$ cat /proc/kallsyms | grep variable_name
 
 
 List Available Kernel Modules:
@@ -140,6 +140,10 @@ modprobe -l | less
 
 List Currently Loaded Modules:
 lsmod | less
+
+Kernel message
+dmesg
+real time: watch "dmesg | tail -20"
 
 
 

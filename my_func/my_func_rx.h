@@ -5,7 +5,6 @@
 #include <linux/skbuff.h>
 #include <net/sock.h>
 #include <linux/ip.h>
-#include "my_func_tx.h"
 
 #define SADDR 1
 #define DADDR 2
@@ -13,7 +12,7 @@
 //struct iphdr *network_header;
 //struct ethhdr *eth;
 //__be32 ip_address;
-//unsigned long long before;
+extern unsigned long long before;
 //unsigned long before_high;
 //unsigned long before_low;
 unsigned long long after;

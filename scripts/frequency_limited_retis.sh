@@ -1,18 +1,23 @@
 #! /bin/sh
 
-#! /bin/sh
-
 echo "-----------------------------------------" && 
 echo "offline 2nd cpu in multiprocessor system" && 
 echo "-----------------------------------------" && 
-echo 1 > /sys/devices/system/cpu/cpu1/online
+echo 0 > /sys/devices/system/cpu/cpu1/online
 
 sleep 2 &&
 
 echo "------------------------" && 
-echo "set governor: ondemand " && 
+echo "set governor: userspace " && 
 echo "------------------------" && 
-cpufreq-set -g ondemand && 
+cpufreq-set -g userspace && 
+
+sleep 2 &&
+
+echo "-----------------" && 
+echo "set freq 2Ghz" && 
+echo "-----------------" && 
+cpufreq-set -f 2000Mhz && 
 
 sleep 2 &&
 

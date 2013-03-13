@@ -15,7 +15,7 @@ cpufreq-set -g userspace &&
 sleep 2 &&
 
 echo "-----------------" && 
-echo "set freq 1.20Mhz" && 
+echo "set freq 1.20Ghz" && 
 echo "-----------------" && 
 cpufreq-set -f 1200Mhz && 
 

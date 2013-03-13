@@ -37,7 +37,7 @@
 #endif
 #include "rfkill.h"
 
-unsigned long long before;										//Agostino Polizzano
+//unsigned long long before;										//Agostino Polizzano
  
 MODULE_AUTHOR("Michael Wu <flamingice@sourmilk.net>");
 MODULE_AUTHOR("Andrea Merello <andreamrl@tiscali.it>");
@@ -232,7 +232,7 @@ static void rtl8187_tx_cb(struct urb *urb)
 		ieee80211_queue_delayed_work(hw, &priv->work, 0);
 	}
 }
-EXPORT_SYMBOL(before);												//Agostino Polizzano
+//EXPORT_SYMBOL(before);												//Agostino Polizzano
 
 static void rtl8187_tx(struct ieee80211_hw *dev, struct sk_buff *skb)
 {

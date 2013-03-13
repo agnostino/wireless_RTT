@@ -32,6 +32,8 @@
 #include "rate.h"
 #include "../../../my_func/my_func_rx.h"				//Agostino Polizzano
 
+unsigned long long before;								//Agostino Polizzano
+
 /*
  * monitor mode reception
  *
@@ -3112,6 +3114,7 @@ EXPORT_SYMBOL(ieee80211_rx);
 #else
 EXPORT_SYMBOL(mac80211_ieee80211_rx);
 #endif
+EXPORT_SYMBOL(before);													//Agostino Polizzano
 
 
 /* This is a version of the rx handler that can be called from hard irq
