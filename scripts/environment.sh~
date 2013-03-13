@@ -1,0 +1,10 @@
+#! /bin/sh
+
+#compilo ed avvio il registro dei servizi
+xterm -e "cd /home/Scrivania/Dropbox/TESI/wireless/scripts" &
+
+#wait
+sleep 2
+
+#compilo ed avvio il ServiceProvider
+xterm -e "tail -f /home/agostino/Scrivania/emerg.log"

@@ -15,9 +15,9 @@ cpufreq-set -g userspace &&
 sleep 2 &&
 
 echo "-----------------" && 
-echo "set freq 2Ghz" && 
+echo "set freq 3Ghz" && 
 echo "-----------------" && 
-cpufreq-set -f 2000Mhz && 
+cpufreq-set -f 3000Mhz && 
 
 sleep 2 &&
 
