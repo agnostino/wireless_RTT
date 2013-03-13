@@ -2,7 +2,7 @@
 #define COMPAT_AUTOCONF_INCLUDED
 /*
  * Automatically generated C config: don't edit
- * mer 13 mar 2013, 14.28.41, CET 
+ * mer 13 mar 2013, 18.15.10, CET 
  * compat-wireless-2.6: compat-wireless-v3.5.4-1-s
  * linux-2.6: v3.5.4
  */
