@@ -21,8 +21,6 @@ static inline void rtt_stop (struct sk_buff *skb, __be32 _ip_address) {
 	//cpu = smp_processor_id();
 	//rdtsc_barrier();
 	//rdtscl(now);
-	after = get_cycles();
-	rtt = after - before;
  	/*
  	* It is possible that we moved to another CPU, and
 	* since TSC's are per-cpu we need to calculate
@@ -40,6 +38,8 @@ static inline void rtt_stop (struct sk_buff *skb, __be32 _ip_address) {
 	if (network_header != NULL)
 		if (network_header->protocol == 1)	//ICMP
 			if (network_header->saddr == _ip_address) {
+				after = get_cycles();
+				rtt = after - before;
 				printk(KERN_EMERG "RTT STOP: sent from %pI4 (packet type: ICMP) timestamp: %llu rtt: %llu\n", &network_header->saddr, after, rtt);
 			}
 }

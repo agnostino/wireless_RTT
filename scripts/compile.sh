@@ -16,10 +16,10 @@ cd /home/agostino/Scrivania/Dropbox/TESI/wireless/compat-wireless-3.5.4-1-s/ &&
 echo "----------------------------" && 
 echo "set only rtl818x driver" && 
 echo "----------------------------" && 
-sudo ./scripts/driver-select rtl818x &&  #only one time
+./scripts/driver-select rtl818x &&  #only one time
 
 #compile
 echo "----------------------------" && 
 echo "compile" && 
 echo "----------------------------" && 
-sudo make
+make

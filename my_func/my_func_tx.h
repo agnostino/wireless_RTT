@@ -35,12 +35,12 @@ static inline void rtt_start (struct sk_buff *skb, __be32 _ip_address) {
 	//preempt_enable();
 	//struct iphdr *network_header;
  	network_header = (struct iphdr *)skb_network_header(skb);
-	before = get_cycles();
-	network_header = (struct iphdr *)skb_network_header(skb);
 	if (network_header != NULL)
 		if (network_header->protocol == 1)	//ICMP
-			if (network_header->daddr == _ip_address)
+			if (network_header->daddr == _ip_address) {
+				before = get_cycles();
 				printk(KERN_EMERG "\nRTT START: sent to %pI4 (packet type: ICMP) timestamp: %llu\n", &network_header->daddr, before);
+			}
 }
 	
 #endif
